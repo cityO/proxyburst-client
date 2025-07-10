@@ -1,0 +1,27 @@
+{
+  "name": "proxyburst-client",
+  "version": "0.1.0",
+  "description": "A client for the ProxyBurst distributed request system. Provides a simple, Promise-based API to send batch requests.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "your-git-repository-url"
+  },
+  "keywords": [
+    "bullmq",
+    "distributed",
+    "proxy",
+    "request",
+    "burst"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "bullmq": "^5.7.8",
+    "redis": "^4.7.1",
+    "uuid": "^9.0.1"
+  }
+}
