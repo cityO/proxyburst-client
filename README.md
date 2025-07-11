@@ -4,6 +4,8 @@
 
 Welcome to the official client for the ProxyBurst system! This package is your sole entry point to the powerful ProxyBurst distributed computing network.
 
+> **Interested in the "Construction Crew"?** Check out the [**`proxyburst-executor`**](https://github.com/cityO/proxyburst-executor) repository to see how the other half works!
+
 ## 1. What Is This & Why Should I Use It?
 
 Imagine you need to make 10,000 individual API calls to a server. Running this sequentially in a normal script could take minutes, or even hours.
@@ -33,8 +35,6 @@ The client offers two different ways to receive your final report, depending on 
 2.  **Stream Mode (`.requestStream()`)**: **Use this for extremely large projects.**
     -   *Analogy*: Your project is so massive that one folder can't hold all the reports. So, your assistant adopts a new strategy: as soon as any worker completes a work order, they immediately run over and hand you that single report. You receive a continuous "stream" of individual reports.
     -   *Use Case*: Prevents your application from crashing due to high memory usage when you expect tens of thousands or even millions of results, and each result might be large.
-
-> **Interested in the "Construction Crew"?** Check out the [**`proxyburst-executor`**](https://github.com/cityO/proxyburst-executor) repository to see how the other half works!
 
 ---
 
