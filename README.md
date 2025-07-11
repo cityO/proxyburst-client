@@ -1,52 +1,56 @@
-# ProxyBurst 客户端 (v2.0) - 更智能的分布式请求方式
+[English](README.md) | [简体中文](README.zh-CN.md)
 
-欢迎使用 ProxyBurst 系统的官方客户端！这个软件包是你接入强大的 ProxyBurst 分布式计算网络的唯一入口。
+# ProxyBurst Client (v2.0) - A Smarter Way to Distribute Requests
 
-## 1. 这是什么？为什么我应该使用它？
+Welcome to the official client for the ProxyBurst system! This package is your sole entry point to the powerful ProxyBurst distributed computing network.
 
-想象一下, 你需要向一个服务器单独发起 10,000 次 API 调用。如果在一个普通的脚本里按顺序执行, 这可能会花费几分钟甚至几小时。
+## 1. What Is This & Why Should I Use It?
 
-**ProxyBurst 正是为解决此问题而生。** 它允许你将所有这 10,000 个请求打包成一个 "任务" 并提交。在幕后, 一整个 "执行器" (Executor) 工作集群将会接收你的请求, 并同时 (并行) 运行它们, 将总耗时从几小时戏剧性地缩短到短短几秒。
+Imagine you need to make 10,000 individual API calls to a server. Running this sequentially in a normal script could take minutes, or even hours.
 
-本客户端就是你用来操控这个执行器集群的 "遥控器"。它的设计目标是既强大又简单, 将所有复杂的分布式逻辑都隐藏在一个干净、现代的 JavaScript API 背后。
+**ProxyBurst is built to solve this exact problem.** It allows you to package all 10,000 requests into a single "task" and submit it. Behind the scenes, a whole cluster of "Executor" workers will receive your requests and run them all at the same time (in parallel), dramatically cutting the total time from hours to mere seconds.
 
----
-
-## 2. 为初学者准备的核心概念
-
-### “项目经理与施工队”的比喻
-- **你 (项目经理)**: 你有一个大工程, 比如建一栋摩天大楼。
-- **`ProxyBurstClient` (你的助理)**: 本客户端就是你值得信赖的助理。你将你的工程计划交给这位助理。
-- **工程计划 (一个 "任务")**: 这是你想要发起的所有独立请求所组成的数组。
-- **施工队 (`ProxyBurstExecutor` 集群)**: 这是一支由 5 个、50 个、甚至 500 个工人组成的、随时待命的团队。
-- **魔法发生的过程**: 你的助理 (`client`) 接收你的工程计划, 将其拆解成数千个独立的工单, 并把它们贴在一个 "任务板" 上 (这是一个 Redis 队列)。工人们 (`executors`) 会一拥而上, 从任务板上领取工单, 完成它, 然后报告结果。助理会一直等到每一张工单都被完成后, 收集所有的报告, 并将它们整理成一份漂亮的报告交还给你。
-
-### 获取报告的两种方式: Promise vs. Stream
-客户端提供了两种不同的方式来接收你的最终报告, 具体取决于你工程的规模。
-
-1.  **Promise 模式 (`.request()`)**: **大多数情况下使用此模式。**
-    -   *比喻*: 你的助理等到所有工人都完工后, 将他们所有的报告收集到一个巨大的文件夹里, 然后一次性地将整个文件夹交给你。
-    -   *使用场景*: 简单、便捷, 非常适合当你预期的结果数量在合理范围内时。通过一个 `await` 就能一次性获得所有东西。
-
-2.  **Stream 模式 (`.requestStream()`)**: **当工程极其巨大时使用此模式。**
-    -   *比喻*: 你的工程太庞大了, 一个文件夹根本装不下。于是, 你的助理采取了新的策略：任何一个工人只要完成一张工单, 他就立刻跑过来将这张报告单独交给你。这样, 你会持续地收到一个由单张报告组成的 "流"。
-    -   *使用场景*: 当你预期有成千上万甚至数百万的返回结果, 且每个结果都可能很大时, 此模式可以防止你的程序因内存占用过高而崩溃。
+This client is the "remote control" you use to command that executor cluster. It's designed to be both powerful and simple, hiding all the complex distributed logic behind a clean, modern JavaScript API.
 
 ---
 
-## 3. 快速上手: 你的第一个分布式请求
+## 2. Core Concepts for Beginners
 
-### 第 1 步: 安装
+### The "Project Manager & Construction Crew" Analogy
+- **You (The Project Manager)**: You have a big project, like building a skyscraper.
+- **`ProxyBurstClient` (Your Assistant)**: This client is your trusted assistant. You hand your project plan to this assistant.
+- **The Project Plan (A "Task")**: This is the array of all the individual requests you want to make.
+- **The Construction Crew (`ProxyBurstExecutor` Cluster)**: This is a team of 5, 50, or even 500 workers, always on standby.
+- **Where the Magic Happens**: Your assistant (`client`) takes your project plan, breaks it down into thousands of individual work orders, and posts them on a "job board" (a Redis queue). The workers (`executors`) swarm the job board, grab a work order, complete it, and report the result. The assistant waits until every single work order is done, collects all the reports, and hands them back to you in one neat package.
+
+### Two Ways to Get Your Report: Promise vs. Stream
+The client offers two different ways to receive your final report, depending on the scale of your project.
+
+1.  **Promise Mode (`.request()`)**: **Use this most of the time.**
+    -   *Analogy*: Your assistant waits for all workers to finish, collects all their reports into one giant folder, and hands you the entire folder at once.
+    -   *Use Case*: Simple, convenient, and perfect for when you expect a reasonable number of results. You get everything at once with a single `await`.
+
+2.  **Stream Mode (`.requestStream()`)**: **Use this for extremely large projects.**
+    -   *Analogy*: Your project is so massive that one folder can't hold all the reports. So, your assistant adopts a new strategy: as soon as any worker completes a work order, they immediately run over and hand you that single report. You receive a continuous "stream" of individual reports.
+    -   *Use Case*: Prevents your application from crashing due to high memory usage when you expect tens of thousands or even millions of results, and each result might be large.
+
+> **Interested in the "Construction Crew"?** Check out the [**`proxyburst-executor`**](https://github.com/cityO/proxyburst-executor) repository to see how the other half works!
+
+---
+
+## 3. Quick Start: Your First Distributed Request
+
+### Step 1: Installation
 ```bash
 npm install proxyburst-client
 ```
 
-### 第 2 步: 初始化客户端
-在你的项目中, 创建一个客户端实例。这个实例应该是长生命周期的, 就像一个数据库连接一样。
+### Step 2: Initialize the Client
+In your project, create a client instance. This instance should be long-lived, much like a database connection.
 ```javascript
 const { ProxyBurstClient } = require('proxyburst-client');
 
-// 这些选项必须指向你的执行器集群所连接的同一个 Redis 服务器。
+// These options must point to the same Redis server your executor cluster is connected to.
 const redisOptions = {
   host: '127.0.0.1',
   port: 6379,
@@ -55,43 +59,43 @@ const redisOptions = {
 const client = new ProxyBurstClient(redisOptions);
 ```
 
-### 第 3 步: 创建并发送请求 (Promise 模式)
-这是使用本客户端最常见的方式。
+### Step 3: Create and Send a Request (Promise Mode)
+This is the most common way to use the client.
 
 ```javascript
 async function getMyUsers() {
   try {
-    console.log('正在构建请求...');
-    // a) 使用内置的 .createRequest() 辅助函数来创建每一个独立的请求。
+    console.log('Building requests...');
+    // a) Use the built-in .createRequest() helper to build each individual request.
     const request1 = client.createRequest({ url: 'https://jsonplaceholder.typicode.com/users/1' });
     const request2 = client.createRequest({ url: 'https://jsonplaceholder.typicode.com/users/2' });
-    const request3 = client.createRequest({ url: 'https://jsonplaceholder.typicode.com/users/invalid' }); // 这是一个会失败的请求
+    const request3 = client.createRequest({ url: 'https://jsonplaceholder.typicode.com/users/invalid' }); // This one will fail
 
-    // b) 将它们组织成一个任务数组。
+    // b) Organize them into a task array.
     const myTask = [request1, request2, request3];
 
-    console.log('正在将任务发送到分布式网络...');
-    // c) 发送整个任务, 并等待最终聚合后的结果。
+    console.log('Sending task to the distributed network...');
+    // c) Send the entire task and await the final, aggregated result.
     const results = await client.request(myTask);
 
-    console.log('任务完成！所有结果均已返回。');
+    console.log('Task complete! All results have been returned.');
 
-    // d) 处理你的结果。
+    // d) Process your results.
     const successfulUsers = results.filter(r => r.success);
     const failedRequests = results.filter(r => !r.success);
 
-    console.log(`成功获取 ${successfulUsers.length} 个用户。`);
-    console.log(`获取失败 ${failedRequests.length} 个用户。`);
+    console.log(`Successfully fetched ${successfulUsers.length} users.`);
+    console.log(`Failed to fetch ${failedRequests.length} users.`);
 
     if (failedRequests.length > 0) {
-      console.log('第一个失败请求的详情:', failedRequests[0].error.message);
+      console.log('Details of the first failed request:', failedRequests[0].error.message);
     }
 
   } catch (error) {
-    // 这里会捕获灾难性的错误, 例如无法连接到队列。
-    console.error('整个任务失败!', error);
+    // This will catch catastrophic errors, like a failure to connect to the queue.
+    console.error('The entire task failed!', error);
   } finally {
-    // e) 在你的应用关闭前, 关闭连接。
+    // e) Before your app shuts down, close the connection.
     await client.close();
   }
 }
@@ -101,52 +105,52 @@ getMyUsers();
 
 ---
 
-## 4. API 深度指南
+## 4. In-Depth API Guide
 
 ### `client.createRequest(userConfig)`
-这是一个用来构建标准化的、可追踪的请求对象的辅助函数。
-- `userConfig` (object): 一个用户友好的、描述你请求的对象。
-  - `url` (string): **必需**。目标端点 URL。
-  - `method` (string): 可选, 默认为 `GET`。
-  - `params` (object): 可选。对于 `GET` 请求, 这是查询字符串参数。对于 `POST`/`PUT` 请求, 这是请求体。
-  - `headers` (object): 可选。任何 HTTP 头。
-- **返回**: 一个标准的、可被 `axios` 直接执行的配置对象。你无需关心此对象的内部结构, 只需将其传递给 `.request()` 或 `.requestStream()` 即可。
+A helper function to build standardized, trackable request objects.
+- `userConfig` (object): A user-friendly object describing your request.
+  - `url` (string): **Required**. The target endpoint URL.
+  - `method` (string): Optional, defaults to `GET`.
+  - `params` (object): Optional. For `GET` requests, these are the query string parameters. For `POST`/`PUT`, this is the request body.
+  - `headers` (object): Optional. Any HTTP headers.
+- **Returns**: A standard configuration object that can be directly executed by `axios`. You don't need to worry about the internal structure of this object; just pass it to `.request()` or `.requestStream()`.
 
-### `client.request(requestsArray, [taskConfig])` - Promise 模式
-发送一个任务, 并在任务完成时, 返回一个包含所有结果的 `Promise` 数组。
-- `requestsArray` (Array): **必需**。一个由 `client.createRequest()` 创建的对象组成的数组。
-- `taskConfig` (object): 可选。用于整个任务的配置。
-  - `taskName` (string): 一个人类可读的任务名称, 用于日志记录 (例如, `'fetch-all-user-profiles'`)。
-  - 你也可以在这里传递任何标准的 BullMQ 任务选项, 例如 `priority`, `attempts`, `backoff`。
-- **返回**: 一个 `Promise`, 它会解析为一个 `Array` 数组。该结果数组的顺序保证与你输入的 `requestsArray` 的顺序一致。
+### `client.request(requestsArray, [taskConfig])` - Promise Mode
+Sends a task and returns a `Promise` that resolves to an array containing all results when the task is complete.
+- `requestsArray` (Array): **Required**. An array of objects created by `client.createRequest()`.
+- `taskConfig` (object): Optional. Configuration for the entire task.
+  - `taskName` (string): A human-readable name for the task, used for logging (e.g., `'fetch-all-user-profiles'`).
+  - You can also pass any standard BullMQ job options here, like `priority`, `attempts`, `backoff`.
+- **Returns**: A `Promise` that resolves to an `Array`. The order of the result array is guaranteed to match the order of your input `requestsArray`.
 
-**结果对象的结构:**
-返回数组中的每一个对象都将拥有此结构:
+**Result Object Structure:**
+Every object in the returned array will have this structure:
 ```javascript
-// 成功时
+// On success
 {
   success: true,
-  input: { ... }, // 你最初创建的那个请求对象
+  input: { ... }, // The original request object you created
   status: 200,
-  data: { ... }    // 从 API 返回的真实数据
+  data: { ... }    // The actual data returned from the API
 }
 
-// 失败时
+// On failure
 {
   success: false,
-  input: { ... }, // 你最初创建的那个请求对象
+  input: { ... }, // The original request object you created
   error: {
     message: "Request failed with status code 404",
     status: 404,
-    // ... 以及其他错误详情
+    // ... and other error details
   }
 }
 ```
 
-### `client.requestStream(requestsArray, [taskConfig])` - Stream 模式
-发送一个任务, 并返回一个异步迭代器 (`AsyncGenerator`), 它会在结果完成时逐个地 `yield` 它们。
-- 参数与 `.request()` 完全相同。
-- **返回**: 一个 `AsyncGenerator`。你可以通过 `for await...of` 循环来消费它。
+### `client.requestStream(requestsArray, [taskConfig])` - Stream Mode
+Sends a task and returns an `AsyncGenerator` that `yield`s results one by one as they are completed.
+- Arguments are identical to `.request()`.
+- **Returns**: An `AsyncGenerator`. You can consume it using a `for await...of` loop.
 
 ```javascript
 async function streamProcessAvatars() {
@@ -157,18 +161,18 @@ async function streamProcessAvatars() {
   const resultsStream = client.requestStream(requests);
   let processedCount = 0;
 
-  console.log('开始处理头像数据流...');
+  console.log('Starting to process avatar stream...');
   for await (const result of resultsStream) {
-    // 这个循环体会执行 5000 次, 每当一个结果返回时就执行一次。
-    // 内存使用率保持在极低的水平, 因为我们没有一次性将所有结果都存储起来。
+    // This loop body will execute 5000 times, once for each result as it comes in.
+    // Memory usage remains extremely low because we aren't storing all results at once.
     if (result.success) {
       // processAvatar(result.data);
       processedCount++;
     }
   }
-  console.log(`数据流处理完毕。共处理了 ${processedCount} 个头像。`);
+  console.log(`Stream processing finished. Processed ${processedCount} avatars.`);
 }
 ```
 
 ### `client.close()`
-一个 `async` 方法, 它会优雅地关闭所有到 Redis 的连接。请总是在你的应用退出前调用它, 以确保干净地关闭。
+An `async` method that gracefully closes all connections to Redis. Always call this before your application exits to ensure a clean shutdown. 
