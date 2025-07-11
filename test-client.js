@@ -20,10 +20,12 @@ async function runPromiseTest(client) {
   });
 
   const requests = [req1, req2, req3];
+  const startTime = Date.now();
 
   try {
     const results = await client.request(requests, { taskName: 'promise-mode-test' });
-    console.log(`[测试 1/3] Promise 模式任务完成，收到 ${results.length} 个结果。`);
+    const duration = (Date.now() - startTime) / 1000;
+    console.log(`[测试 1/3] Promise 模式任务完成，收到 ${results.length} 个结果 (耗时: ${duration.toFixed(2)}s)。`);
 
     const successful = results.filter(r => r.success);
     const failed = results.filter(r => !r.success);
@@ -52,6 +54,7 @@ async function runStreamTest(client) {
     })
   );
 
+  const startTime = Date.now();
   try {
     const resultsStream = client.requestStream(requests, { taskName: 'stream-mode-test' });
     const receivedResults = [];
@@ -61,8 +64,9 @@ async function runStreamTest(client) {
       console.log(`[测试 2/3] Stream: 收到第 ${receivedResults.length} 个结果...`);
     }
 
+    const duration = (Date.now() - startTime) / 1000;
     if (receivedResults.length === requests.length) {
-      console.log(`[测试 2/3] ✅ 通过: Stream 模式成功接收了所有 ${receivedResults.length} 个结果。`);
+      console.log(`[测试 2/3] ✅ 通过: Stream 模式成功接收了所有 ${receivedResults.length} 个结果 (耗时: ${duration.toFixed(2)}s)。`);
       return true;
     } else {
       console.error(`[测试 2/3] ❌ 失败: Stream 模式接收的结果数量不匹配 (预期: ${requests.length}, 收到: ${receivedResults.length})。`);
@@ -78,6 +82,7 @@ async function runStreamTest(client) {
 async function runConcurrentMixedTest(client) {
   console.log('\n[测试 3/3] 准备并发执行 Promise 和 Stream 模式任务...');
 
+  const startTime = Date.now();
   const promiseTask = runPromiseTest(client);
   const streamTask = runStreamTest(client);
 
@@ -86,8 +91,9 @@ async function runConcurrentMixedTest(client) {
     streamTask
   ]);
 
+  const duration = (Date.now() - startTime) / 1000;
   if (promiseResult && streamResult) {
-    console.log('[测试 3/3] ✅ 通过: Promise 和 Stream 模式并发测试均成功。');
+    console.log(`[测试 3/3] ✅ 通过: Promise 和 Stream 模式并发测试均成功 (总耗时: ${duration.toFixed(2)}s)。`);
     return true;
   } else {
     console.error('[测试 3/3] ❌ 失败: 并发测试中存在失败的子任务。');
@@ -101,6 +107,7 @@ async function runConcurrentMixedTest(client) {
  */
 async function runIntegrationTest() {
   console.log('--- 启动 ProxyBurst v2 客户端集成测试 ---');
+  const totalStartTime = Date.now();
 
   const redisOptions = {
     host: process.env.REDIS_HOST || '127.0.0.1',
@@ -123,6 +130,8 @@ async function runIntegrationTest() {
     console.error(`测试过程中出现意外的顶层错误: ${e.message}`);
     testResults.push(false);
   } finally {
+    const totalDuration = (Date.now() - totalStartTime) / 1000;
+    console.log(`\n--- 测试套件总耗时: ${totalDuration.toFixed(2)}s ---`);
     await client.close();
     console.log('\n客户端连接已关闭。');
     console.log('--- ProxyBurst v2 客户端集成测试结束 ---');
