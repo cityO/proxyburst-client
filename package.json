@@ -1,6 +1,6 @@
 {
   "name": "proxyburst-client",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A client for the ProxyBurst distributed request system. Provides a simple, Promise-based API to send batch requests.",
   "main": "index.js",
   "scripts": {
