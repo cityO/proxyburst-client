@@ -8,8 +8,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "your-git-repository-url"
+    "url": "git+https://github.com/cityO/proxyburst-client.git"
   },
+  "bugs": {
+    "url": "https://github.com/cityO/proxyburst-client/issues"
+  },
+  "homepage": "https://github.com/cityO/proxyburst-client#readme",
   "keywords": [
     "bullmq",
     "distributed",
@@ -17,7 +21,7 @@
     "request",
     "burst"
   ],
-  "author": "Your Name",
+  "author": "cityO",
   "license": "MIT",
   "dependencies": {
     "bullmq": "^5.7.8",
